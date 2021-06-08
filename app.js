@@ -6,8 +6,10 @@ const connectDB = require('./config/db');
 
 const app = express();
 
+// connect database
 connectDB();
 
+// apply middleware
 app.use(cors());
 
 const PORT = process.env.PORT;
