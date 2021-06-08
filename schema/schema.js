@@ -146,8 +146,7 @@ const Mutation = new GraphQLObjectType({
       args: {
         tagId: { type: new GraphQLNonNull(GraphQLID) },
         tagName: { type: new GraphQLNonNull(GraphQLString) },
-        tagColor: { type: new GraphQLNonNull(GraphQLString) },
-        noteId: { type: GraphQLList(GraphQLID) },
+        tagColor: { type: new GraphQLNonNull(GraphQLString) }
       },
       resolve: async (parent, args) => {
         try {
@@ -161,6 +160,27 @@ const Mutation = new GraphQLObjectType({
         }
       },
     },
+
+    updateTagWithNoteId: {
+      type: TagType,
+      args: {
+        tagId: { type: new GraphQLNonNull(GraphQLID) },
+        noteId: { type: GraphQLID}
+      },
+      resolve: async (parent, args) => {
+        try {
+          const tag = await Tag.findById(args.tagId);
+
+          await Tag.findOneAndUpdate(
+            { _id: args.tagId },
+            { $set: { noteId: [...tag.noteId, args.noteId] } },
+            { new: true }
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    }
   },
 });
 
