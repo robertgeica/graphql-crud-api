@@ -3,7 +3,13 @@ const Category = require('../models/category');
 const Note = require('../models/note');
 const Tag = require('../models/tag');
 
-const { GraphQLObjectType, GraphQLList, GraphQLString, GraphQLID } = graphql;
+const {
+  GraphQLObjectType,
+  GraphQLList,
+  GraphQLString,
+  GraphQLID,
+  GraphQLNonNull,
+} = graphql;
 
 const CategoryType = new GraphQLObjectType({
   name: 'Category',
@@ -11,7 +17,7 @@ const CategoryType = new GraphQLObjectType({
     id: { type: GraphQLID },
     categoryName: { type: GraphQLString },
     notes: {
-      type: new graphql.GraphQLList(NoteType),
+      type: new GraphQLList(NoteType),
       resolve(parent, args) {
         return Note.find({ categoryId: parent.id });
       },
@@ -85,7 +91,59 @@ const RootQuery = new GraphQLObjectType({
 });
 
 // mutations
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    addCategory: {
+      type: CategoryType,
+      args: {
+        categoryName: { type: GraphQLString },
+      },
+      resolve(parent, args) {
+        let category = new Category({
+          categoryName: args.categoryName,
+        });
+        return category.save();
+      },
+    },
+
+    addNote: {
+      type: NoteType,
+      args: {
+        noteTitle: { type: new GraphQLNonNull(GraphQLString) },
+        noteBody: { type: new GraphQLNonNull(GraphQLString) },
+        categoryId: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve(parent, args) {
+        let note = new Note({
+          noteTitle: args.noteTitle,
+          noteBody: args.noteBody,
+          categoryId: args.categoryId,
+        });
+        return note.save();
+      },
+    },
+
+    addTag: {
+      type: TagType,
+      args: {
+        tagName: { type: new GraphQLNonNull(GraphQLString) },
+        tagColor: { type: new GraphQLNonNull(GraphQLString) },
+        noteId: { type: new GraphQLList(GraphQLID) },
+      },
+      resolve(parent, args) {
+        let tag = new Tag({
+          tagName: args.tagName,
+          tagColor: args.tagColor,
+          noteId: args.noteId,
+        });
+        return tag.save();
+      },
+    },
+  },
+});
 
 module.exports = new graphql.GraphQLSchema({
   query: RootQuery,
+  mutation: Mutation,
 });
