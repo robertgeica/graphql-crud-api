@@ -140,6 +140,27 @@ const Mutation = new GraphQLObjectType({
         return tag.save();
       },
     },
+
+    updateTag: {
+      type: TagType,
+      args: {
+        tagId: { type: new GraphQLNonNull(GraphQLID) },
+        tagName: { type: new GraphQLNonNull(GraphQLString) },
+        tagColor: { type: new GraphQLNonNull(GraphQLString) },
+        noteId: { type: GraphQLList(GraphQLID) },
+      },
+      resolve: async (parent, args) => {
+        try {
+          await Tag.findOneAndUpdate(
+            { _id: args.tagId },
+            { $set: { tagName: args.tagName, tagColor: args.tagColor } },
+            { new: true }
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    },
   },
 });
 
