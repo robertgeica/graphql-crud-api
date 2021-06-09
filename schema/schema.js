@@ -106,6 +106,25 @@ const Mutation = new GraphQLObjectType({
         return category.save();
       },
     },
+    updateCategory: {
+      type: CategoryType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        categoryName: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: async (parent, args) => {
+        try {
+          await Category.findOneAndUpdate(
+            { _id: args.id },
+            { $set: { categoryName: args.categoryName } },
+            { new: true }
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    },
+    // delete category
 
     addNote: {
       type: NoteType,
@@ -123,6 +142,8 @@ const Mutation = new GraphQLObjectType({
         return note.save();
       },
     },
+
+    // edit note, delete note
 
     addTag: {
       type: TagType,
@@ -181,6 +202,7 @@ const Mutation = new GraphQLObjectType({
         }
       },
     }
+    // deleteNoteIdFromTag, delete tag
   },
 });
 
