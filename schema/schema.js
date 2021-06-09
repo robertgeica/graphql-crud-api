@@ -173,7 +173,19 @@ const Mutation = new GraphQLObjectType({
         }
       },
     },
-    //  delete note
+    deleteNote: {
+      type: NoteType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) }
+      },
+      resolve: async (parent, args) => {
+        try {
+          await Note.findOneAndDelete({ _id: args.id })
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    },
 
     addTag: {
       type: TagType,
