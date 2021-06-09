@@ -142,7 +142,25 @@ const Mutation = new GraphQLObjectType({
         return note.save();
       },
     },
-
+    updateNote: {
+      type: NoteType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        noteTitle: { type: new GraphQLNonNull(GraphQLString) },
+        noteBody: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve: async (parent, args) => {
+        try {
+          await Note.findOneAndUpdate(
+            { _id: args.id },
+            { $set: { noteTitle: args.noteTitle, noteBody: args.noteBody } },
+            { new: true }
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    },
     // edit note, delete note
 
     addTag: {
