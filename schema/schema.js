@@ -253,6 +253,30 @@ const Mutation = new GraphQLObjectType({
         }
       },
     },
+    deleteNoteIdFromTag: {
+      type: TagType,
+      args: {
+        tagId: { type: new GraphQLNonNull(GraphQLID) },
+        noteID: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve: async (parent, args) => {
+        try {
+          const tag = await Tag.findById(args.tagId);
+
+          await Tag.findOneAndUpdate(
+            { _id: args.tagId },
+            {
+              $set: {
+                noteId: tag.noteId.filter((note) => note !== args.noteID),
+              },
+            },
+            { new: true }
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    },
 
     deleteTag: {
       type: TagType,
@@ -267,7 +291,6 @@ const Mutation = new GraphQLObjectType({
         }
       },
     },
-    // deleteNoteIdFromTag
   },
 });
 
