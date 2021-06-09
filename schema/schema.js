@@ -43,6 +43,7 @@ const NoteType = new GraphQLObjectType({
 const TagType = new GraphQLObjectType({
   name: 'Tag',
   fields: () => ({
+    id: { type: GraphQLID },
     tagName: { type: GraphQLString },
     tagColor: { type: GraphQLString },
   }),
@@ -64,6 +65,14 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: GraphQLID } },
       resolve(parent, args) {
         return Note.findById(args.id);
+      },
+    },
+
+    tag: {
+      type: TagType,
+      args: { id: { type: GraphQLID } },
+      resolve(parent, args) {
+        return Tag.findById(args.id);
       },
     },
 
@@ -110,7 +119,7 @@ const Mutation = new GraphQLObjectType({
       type: CategoryType,
       args: {
         id: { type: new GraphQLNonNull(GraphQLID) },
-        categoryName: { type: new GraphQLNonNull(GraphQLString) }
+        categoryName: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve: async (parent, args) => {
         try {
@@ -127,15 +136,15 @@ const Mutation = new GraphQLObjectType({
     deleteCategory: {
       type: CategoryType,
       args: {
-        id: { type: new GraphQLNonNull(GraphQLID) }
+        id: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve: async (parent, args) => {
         try {
-          await Category.findOneAndDelete({ _id: args.id })
+          await Category.findOneAndDelete({ _id: args.id });
         } catch (error) {
           console.log(error);
         }
-      }
+      },
     },
 
     addNote: {
@@ -176,15 +185,15 @@ const Mutation = new GraphQLObjectType({
     deleteNote: {
       type: NoteType,
       args: {
-        id: { type: new GraphQLNonNull(GraphQLID) }
+        id: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve: async (parent, args) => {
         try {
-          await Note.findOneAndDelete({ _id: args.id })
+          await Note.findOneAndDelete({ _id: args.id });
         } catch (error) {
           console.log(error);
         }
-      }
+      },
     },
 
     addTag: {
@@ -209,7 +218,7 @@ const Mutation = new GraphQLObjectType({
       args: {
         tagId: { type: new GraphQLNonNull(GraphQLID) },
         tagName: { type: new GraphQLNonNull(GraphQLString) },
-        tagColor: { type: new GraphQLNonNull(GraphQLString) }
+        tagColor: { type: new GraphQLNonNull(GraphQLString) },
       },
       resolve: async (parent, args) => {
         try {
@@ -228,7 +237,7 @@ const Mutation = new GraphQLObjectType({
       type: TagType,
       args: {
         tagId: { type: new GraphQLNonNull(GraphQLID) },
-        noteId: { type: GraphQLID}
+        noteId: { type: GraphQLID },
       },
       resolve: async (parent, args) => {
         try {
@@ -243,8 +252,22 @@ const Mutation = new GraphQLObjectType({
           console.log(error);
         }
       },
-    }
-    // deleteNoteIdFromTag, delete tag
+    },
+
+    deleteTag: {
+      type: TagType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve: async (parent, args) => {
+        try {
+          await Tag.findOneAndDelete({ _id: args.id });
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    },
+    // deleteNoteIdFromTag
   },
 });
 
