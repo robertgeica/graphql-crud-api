@@ -124,7 +124,19 @@ const Mutation = new GraphQLObjectType({
         }
       },
     },
-    // delete category
+    deleteCategory: {
+      type: CategoryType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) }
+      },
+      resolve: async (parent, args) => {
+        try {
+          await Category.findOneAndDelete({ _id: args.id })
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    },
 
     addNote: {
       type: NoteType,
@@ -161,7 +173,7 @@ const Mutation = new GraphQLObjectType({
         }
       },
     },
-    // edit note, delete note
+    //  delete note
 
     addTag: {
       type: TagType,
